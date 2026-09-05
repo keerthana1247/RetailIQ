@@ -1,0 +1,303 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RetailIQ - AI Sales & Inventory Copilot</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="nav-brand">
+      <div class="brand-logo">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <path d="M16 10a4 4 0 0 1-8 0"></path>
+        </svg>
+      </div>
+      <div>
+        <h1 class="brand-title">RetailIQ</h1>
+        <p class="brand-sub">AI Sales & Inventory Copilot <span class="badge-track">PS03</span></p>
+      </div>
+    </div>
+
+    <!-- Filter Controls -->
+    <div class="nav-filters">
+      <div class="filter-group">
+        <label for="store-select">Store</label>
+        <select id="store-select">
+          <option value="">All Stores</option>
+          <option value="S001">Flagship - Downtown (S001)</option>
+          <option value="S002">Metro - West End (S002)</option>
+          <option value="S003">Suburban - Oakridge (S003)</option>
+          <option value="S004">Express - Airport (S004)</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="timeframe-select">Timeframe</label>
+        <select id="timeframe-select">
+          <option value="30" selected>Last 30 Days</option>
+          <option value="14">Last 14 Days</option>
+          <option value="60">Last 60 Days</option>
+        </select>
+      </div>
+
+      <div class="status-indicator">
+        <span class="status-dot"></span>
+        <span id="system-status-text">Backend Connected</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Dashboard -->
+  <main class="dashboard-container">
+    
+    <!-- Executive KPI Row -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Total Revenue</span>
+          <span class="kpi-icon">&#128176;</span>
+        </div>
+        <div class="kpi-value" id="kpi-revenue">$0.00</div>
+        <div class="kpi-footer" id="kpi-timeframe">Last 30 days</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Units Sold</span>
+          <span class="kpi-icon">&#128230;</span>
+        </div>
+        <div class="kpi-value" id="kpi-units">0</div>
+        <div class="kpi-footer">Across all active items</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Orders / Transactions</span>
+          <span class="kpi-icon">&#128221;</span>
+        </div>
+        <div class="kpi-value" id="kpi-orders">0</div>
+        <div class="kpi-footer">Unique checkout events</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-header">
+          <span class="kpi-label">Average Order Value</span>
+          <span class="kpi-icon">&#128200;</span>
+        </div>
+        <div class="kpi-value" id="kpi-aov">$0.00</div>
+        <div class="kpi-footer">Revenue per transaction</div>
+      </div>
+    </section>
+
+    <!-- Today's Attention Section -->
+    <section class="section-card attention-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Today's Attention Center</h2>
+          <p class="section-subtitle">Operational alerts generated directly from deterministic calculations</p>
+        </div>
+        <span class="attention-badge" id="attention-counter">0 Alerts</span>
+      </div>
+
+      <div class="attention-grid">
+        <!-- Stockout Risk Card -->
+        <div class="attention-box alert-danger">
+          <div class="attention-box-header">
+            <span class="alert-tag tag-danger">Imminent Stockout Risk</span>
+            <span class="alert-count" id="stockout-count">0 items</span>
+          </div>
+          <div class="attention-list" id="stockout-list">
+            <div class="placeholder-text">Loading stockout risks...</div>
+          </div>
+        </div>
+
+        <!-- Overstocked Card -->
+        <div class="attention-box alert-warning">
+          <div class="attention-box-header">
+            <span class="alert-tag tag-warning">Overstocked Inventory</span>
+            <span class="alert-count" id="overstock-count">0 items</span>
+          </div>
+          <div class="attention-list" id="overstock-list">
+            <div class="placeholder-text">Loading overstocked items...</div>
+          </div>
+        </div>
+
+        <!-- Sales Spikes & Drops Card -->
+        <div class="attention-box alert-info">
+          <div class="attention-box-header">
+            <span class="alert-tag tag-info">Demand Shifts (14-Day)</span>
+            <span class="alert-count" id="shifts-count">0 items</span>
+          </div>
+          <div class="attention-list" id="shifts-list">
+            <div class="placeholder-text">Loading sales shifts...</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Two Column Grid: Store Ranking + Product Ranking -->
+    <div class="two-col-grid">
+      <!-- Store Performance -->
+      <section class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">Store Performance Leaderboard</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Store</th>
+                <th>Location</th>
+                <th>Units</th>
+                <th>Revenue</th>
+              </tr>
+            </thead>
+            <tbody id="stores-table-body">
+              <tr><td colspan="5" class="placeholder-text">Loading store data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Product Performance -->
+      <section class="section-card">
+        <div class="section-header">
+          <h2 class="section-title">Top Products by Sales</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Units</th>
+                <th>Daily Velocity</th>
+                <th>Revenue</th>
+              </tr>
+            </thead>
+            <tbody id="products-table-body">
+              <tr><td colspan="5" class="placeholder-text">Loading product data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- Inventory Health Table -->
+    <section class="section-card">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Inventory Health & Stock Coverage</h2>
+          <p class="section-subtitle">Real-time stockout estimates: <code>days_until_stockout = current_stock / daily_demand</code></p>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Store</th>
+              <th>Product</th>
+              <th>Current Stock</th>
+              <th>Daily Demand</th>
+              <th>Coverage</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="inventory-table-body">
+            <tr><td colspan="7" class="placeholder-text">Loading inventory data...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- AI Copilot & Evidence Inspector Area -->
+    <section class="section-card copilot-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">&#129302; AI Copilot & Evidence Inspector</h2>
+          <p class="section-subtitle">Natural language retail queries grounded in deterministic calculation proof</p>
+        </div>
+        <span class="copilot-badge">Grounded AI Copilot</span>
+      </div>
+
+      <div class="copilot-grid">
+        <!-- Copilot Chat Window -->
+        <div class="copilot-chat-box">
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-msg assistant">
+              <div class="msg-author">RetailIQ Copilot</div>
+              <div class="msg-bubble">
+                Hello! I am your <strong>Sales & Inventory Copilot</strong>. I answer plain-language questions using only deterministic numbers and verified evidence.
+                <br><br>
+                Try clicking one of the suggested questions below:
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Suggestion Chips -->
+          <div class="prompt-chips">
+            <button class="chip" onclick="selectPrompt('What is running out?')">What is running out?</button>
+            <button class="chip" onclick="selectPrompt('What is overstocked?')">What is overstocked?</button>
+            <button class="chip" onclick="selectPrompt('Which products are slow-moving?')">Which products are slow-moving?</button>
+            <button class="chip" onclick="selectPrompt('Which store has the highest sales?')">Which store has the highest sales?</button>
+            <button class="chip" onclick="selectPrompt('How did Wireless Mouse perform this month?')">How did Wireless Mouse perform?</button>
+          </div>
+
+          <!-- Chat Input -->
+          <div class="chat-input-bar">
+            <input type="text" id="copilot-input" placeholder="Ask questions about sales, inventory, or product performance..." />
+            <button id="copilot-submit" onclick="handleCopilotSubmit()">Ask Copilot</button>
+          </div>
+          <div class="copilot-notice">
+            <span>&#9432; Gemini responses are grounded in deterministic analytics and retrieved local evidence.</span>
+          </div>
+        </div>
+
+        <!-- Evidence & Math Proof Panel -->
+        <div class="evidence-panel">
+          <div class="evidence-header">
+            <h3>Underlying Evidence & Math Proof</h3>
+            <span class="evidence-tag">Deterministic Proof</span>
+          </div>
+          <div class="evidence-body" id="evidence-body">
+            <div class="evidence-item">
+              <span class="evidence-key">Product:</span>
+              <span class="evidence-val" id="ev-product">Wireless Mouse M20 (P001)</span>
+            </div>
+            <div class="evidence-item">
+              <span class="evidence-key">Current Stock:</span>
+              <span class="evidence-val" id="ev-stock">18 units at Flagship Downtown (S001)</span>
+            </div>
+            <div class="evidence-item">
+              <span class="evidence-key">Average Daily Sales:</span>
+              <span class="evidence-val" id="ev-velocity">6.87 units/day (30-day average)</span>
+            </div>
+            <div class="evidence-item">
+              <span class="evidence-key">Coverage Calculation:</span>
+              <span class="evidence-val highlight-code" id="ev-calculation">18 / 6.87 = 2.6 days</span>
+            </div>
+            <div class="evidence-item">
+              <span class="evidence-key">Documented Assumption:</span>
+              <span class="evidence-val" id="ev-assumption">Recent 30-day daily demand assumed to remain consistent over upcoming period.</span>
+            </div>
+            <div class="evidence-item">
+              <span class="evidence-key">Recommendation:</span>
+              <span class="evidence-val alert-rec" id="ev-recommendation">Likely stock-out in approximately 2.6 days. Review reorder quantity immediately.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

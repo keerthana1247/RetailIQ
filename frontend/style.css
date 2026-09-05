@@ -1,0 +1,672 @@
+﻿/* RetailIQ Modern SaaS Theme */
+:root {
+  --bg-main: #0d1117;
+  --bg-card: #161b22;
+  --bg-card-hover: #1c2128;
+  --border-color: #30363d;
+  --text-main: #f0f6fc;
+  --text-muted: #8b949e;
+  --primary: #388bfd;
+  --primary-hover: #58a6ff;
+  --accent-green: #2ea043;
+  --accent-green-bg: rgba(46, 160, 67, 0.15);
+  --accent-red: #f85149;
+  --accent-red-bg: rgba(248, 81, 73, 0.15);
+  --accent-amber: #d29922;
+  --accent-amber-bg: rgba(210, 153, 34, 0.15);
+  --accent-purple: #a371f7;
+  --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-stack);
+  line-height: 1.5;
+  padding-bottom: 50px;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  padding: 16px 28px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-logo {
+  background: linear-gradient(135deg, #1f6feb, #8957e5);
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.brand-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.badge-track {
+  background: #238636;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 12px;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.nav-filters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.filter-group select {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.filter-group select:focus {
+  border-color: var(--primary);
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: #56d364;
+  background: rgba(46, 160, 67, 0.1);
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(46, 160, 67, 0.3);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #3fb950;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #3fb950;
+}
+
+/* Main Container */
+.dashboard-container {
+  max-width: 1400px;
+  margin: 24px auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* KPI Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.kpi-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary);
+}
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.kpi-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kpi-icon {
+  font-size: 1.25rem;
+}
+
+.kpi-value {
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: var(--text-main);
+}
+
+.kpi-footer {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Sections */
+.section-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.section-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.attention-badge {
+  background: var(--accent-red-bg);
+  color: var(--accent-red);
+  border: 1px solid rgba(248, 81, 73, 0.4);
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+/* Today's Attention Grid */
+.attention-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.attention-box {
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.attention-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-tag {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+}
+
+.tag-danger {
+  background: var(--accent-red-bg);
+  color: var(--accent-red);
+}
+
+.tag-warning {
+  background: var(--accent-amber-bg);
+  color: var(--accent-amber);
+}
+
+.tag-info {
+  background: rgba(56, 139, 253, 0.15);
+  color: var(--primary);
+}
+
+.alert-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.attention-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.attention-item-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.84rem;
+}
+
+.attention-item-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.attention-item-name {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.attention-item-sub {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.attention-item-pill {
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.pill-danger {
+  background: var(--accent-red-bg);
+  color: var(--accent-red);
+}
+
+.pill-warning {
+  background: var(--accent-amber-bg);
+  color: var(--accent-amber);
+}
+
+.pill-success {
+  background: var(--accent-green-bg);
+  color: var(--accent-green);
+}
+
+/* Two Column Grid */
+.two-col-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+  gap: 20px;
+}
+
+/* Tables */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background-color: rgba(22, 27, 34, 0.6);
+}
+
+.data-table tr:hover td {
+  background-color: var(--bg-card-hover);
+}
+
+.badge-status {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.badge-out-of-stock { background: #5a1e1e; color: #ff7b72; }
+.badge-critical { background: #5a1e1e; color: #ff7b72; }
+.badge-low { background: #543916; color: #f2cc60; }
+.badge-healthy { background: #1b4b27; color: #7ee787; }
+.badge-overstocked { background: #3d2c5e; color: #d2a8ff; }
+
+.btn-inspect {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  padding: 4px 10px;
+  font-size: 0.76rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-inspect:hover {
+  background: var(--primary);
+  color: white;
+}
+
+/* Copilot Section */
+.copilot-section {
+  border: 1px solid rgba(56, 139, 253, 0.4);
+  box-shadow: 0 0 20px rgba(56, 139, 253, 0.08);
+}
+
+.copilot-badge {
+  background: rgba(163, 113, 247, 0.2);
+  color: var(--accent-purple);
+  border: 1px solid rgba(163, 113, 247, 0.4);
+  font-size: 0.75rem;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.copilot-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 960px) {
+  .copilot-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.copilot-chat-box {
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.chat-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 180px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.chat-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.msg-author {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.chat-msg.user .msg-author {
+  color: #a371f7;
+  text-align: right;
+}
+
+.msg-bubble {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.chat-msg.user .msg-bubble {
+  background: #1f2937;
+  border-color: #374151;
+  align-self: flex-end;
+  max-width: 85%;
+}
+
+.prompt-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 5px 11px;
+  border-radius: 16px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chip:hover {
+  border-color: var(--primary);
+  background: var(--bg-card-hover);
+  color: var(--primary);
+}
+
+.chat-input-bar {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input-bar input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text-main);
+  font-size: 0.88rem;
+  outline: none;
+}
+
+.chat-input-bar input:focus {
+  border-color: var(--primary);
+}
+
+.chat-input-bar button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0 18px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.chat-input-bar button:hover {
+  background: var(--primary-hover);
+}
+
+.copilot-notice {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+/* Evidence Panel */
+.evidence-panel {
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.evidence-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.evidence-header h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.evidence-tag {
+  background: rgba(46, 160, 67, 0.15);
+  color: #3fb950;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.evidence-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 0.84rem;
+}
+
+.evidence-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.evidence-key {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.evidence-val {
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.highlight-code {
+  font-family: monospace;
+  background: #21262d;
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: #79c0ff;
+  display: inline-block;
+}
+
+.alert-rec {
+  color: #f0883e;
+}
+
+.placeholder-text {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 0.82rem;
+  padding: 8px 0;
+}
+
+
+/* Grounded Copilot additions */
+.copilot-source {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  opacity: .75;
+  border: 1px solid rgba(255,255,255,.15);
+}
+.copilot-evidence, .copilot-assumptions {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.evidence-mini {
+  margin-top: 7px;
+  font-size: 12px;
+  line-height: 1.45;
+  opacity: .8;
+}
+.copilot-assumptions ul {
+  margin: 6px 0 0 18px;
+  padding: 0;
+  font-size: 12px;
+  opacity: .8;
+}
+#copilot-submit:disabled {
+  opacity: .6;
+  cursor: wait;
+}

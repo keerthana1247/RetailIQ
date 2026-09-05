@@ -1,0 +1,16 @@
+product_id,product_name,category,unit_price,reorder_point,target_stock
+P001,Wireless Mouse M20,Electronics,29.99,20,60
+P002,Mechanical Keyboard Pro,Electronics,89.99,15,45
+P003,USB-C Multiport Hub,Electronics,39.99,25,75
+P004,Noise-Cancelling Headphones H5,Electronics,149.99,10,30
+P005,Ergonomic Desk Chair Mat,Office Supplies,49.99,10,25
+P006,Adjustable Laptop Stand,Office Supplies,34.99,15,40
+P007,Gel Pen 10-Pack Black,Office Supplies,9.99,30,100
+P008,Hardcover Spiral Notebook,Office Supplies,12.99,25,80
+P009,Braided USB-C Cable 2m,Accessories,14.99,35,120
+P010,Magnetic Phone Car Mount,Accessories,19.99,20,50
+P011,Desk Pad Leatherette 90x40cm,Accessories,24.99,15,40
+P012,Smart LED Desk Lamp,Home & Lifestyle,59.99,12,35
+P013,Insulated Stainless Steel Tumbler,Home & Lifestyle,22.99,20,60
+P014,Ultrasonic Essential Oil Diffuser,Home & Lifestyle,32.99,10,30
+P015,Cable Management Sleeve Kit,Accessories,11.99,20,50

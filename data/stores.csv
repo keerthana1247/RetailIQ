@@ -1,0 +1,5 @@
+store_id,store_name,city,state,store_type,opened_date
+S001,RetailIQ Flagship - Downtown,Seattle,WA,Flagship,2022-01-15
+S002,RetailIQ Metro - West End,Portland,OR,Urban,2022-06-01
+S003,RetailIQ Suburban - Oakridge,Bellevue,WA,Suburban,2023-03-10
+S004,RetailIQ Express - Airport,SeaTac,WA,Express Kiosk,2023-08-20
