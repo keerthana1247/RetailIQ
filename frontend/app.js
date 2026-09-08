@@ -309,21 +309,36 @@ async function inspectProduct(productId, storeId = null) {
 window.inspectProduct = inspectProduct;
 
 // 7. AI Copilot — grounded backend interaction
-async function handleCopilotSubmit() {
+function selectPrompt(promptText) {
+  const submit = document.getElementById("copilot-submit");
+  if (submit && submit.disabled) return;
+
   const input = document.getElementById("copilot-input");
-  const query = input.value.trim();
+  if (input) {
+    input.value = promptText;
+  }
+  handleCopilotSubmit();
+}
+
+async function handleCopilotSubmit() {
+  const submit = document.getElementById("copilot-submit");
+  if (submit && submit.disabled) return;
+
+  const input = document.getElementById("copilot-input");
+  const query = input ? input.value.trim() : "";
   if (!query) return;
 
   const chatMessages = document.getElementById("chat-messages");
-  const submit = document.getElementById("copilot-submit");
 
   const userDiv = document.createElement("div");
   userDiv.className = "chat-msg user";
   userDiv.innerHTML = `<div class="msg-author">Store Manager</div><div class="msg-bubble">${escapeHtml(query)}</div>`;
   chatMessages.appendChild(userDiv);
-  input.value = "";
-  submit.disabled = true;
-  submit.textContent = "Thinking...";
+  if (input) input.value = "";
+  if (submit) {
+    submit.disabled = true;
+    submit.textContent = "Thinking...";
+  }
 
   const loadingDiv = document.createElement("div");
   loadingDiv.className = "chat-msg assistant";
@@ -377,9 +392,13 @@ async function handleCopilotSubmit() {
     botDiv.innerHTML = `<div class="msg-author">RetailIQ Copilot</div><div class="msg-bubble">I couldn't complete that request right now. Deterministic dashboard analytics are still available. <small>${escapeHtml(err.message)}</small></div>`;
     chatMessages.appendChild(botDiv);
   } finally {
-    submit.disabled = false;
-    submit.textContent = "Ask Copilot";
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    if (submit) {
+      submit.disabled = false;
+      submit.textContent = "Ask Copilot";
+    }
+    if (chatMessages) {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
   }
 }
 
