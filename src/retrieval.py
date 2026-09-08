@@ -81,18 +81,47 @@ def build_documents(engine) -> List[Dict[str, Any]]:
         })
     # Deterministic inventory evidence
     for item in engine.get_inventory_health(demand_window_days=30):
+        status = item["health_status"]
+        cov = item["days_until_stockout"]
+        cov_str = f"{cov} days" if cov is not None else ("0 days (out of stock)" if status == "OUT_OF_STOCK" else "N/A")
+
+        if status == "OUT_OF_STOCK":
+            urgency_label = "URGENT REORDER REQUIRED - OUT OF STOCK"
+            urgency_rank = 0
+        elif status == "IMMINENT_STOCKOUT_RISK":
+            urgency_label = f"URGENT REORDER REQUIRED - IMMINENT STOCKOUT RISK ({cov_str} coverage)"
+            urgency_rank = 1
+        elif status == "LOW_STOCK":
+            urgency_label = f"REORDER SOON - LOW STOCK ({cov_str} coverage)"
+            urgency_rank = 2
+        elif status == "OVERSTOCKED":
+            urgency_label = f"OVERSTOCKED ({cov_str} coverage)"
+            urgency_rank = 3
+        else:
+            urgency_label = f"HEALTHY STOCK ({cov_str} coverage)"
+            urgency_rank = 4
+
         docs.append({
             "id": f"inventory-{item['store_id']}-{item['product_id']}",
             "text": (
-                f"Inventory evidence for {item['product_name']} ({item['product_id']}) "
-                f"at {item['store_name']} ({item['store_id']}): current stock "
-                f"{item['current_stock']} units; average daily demand "
-                f"{item['average_daily_demand']} units/day; days until stockout "
-                f"{item['days_until_stockout'] if item['days_until_stockout'] is not None else 'N/A'}; "
-                f"health status {item['health_status']}; reorder point {item['reorder_point']}."
+                f"Inventory evidence [{urgency_label}]: {item['product_name']} ({item['product_id']}) "
+                f"at {item['store_name']} ({item['store_id']}). Current stock: {item['current_stock']} units; "
+                f"average daily demand: {item['average_daily_demand']} units/day; days until stockout: {cov_str}; "
+                f"health status: {status}; reorder point: {item['reorder_point']}; target stock: {item['target_stock']}. "
+                f"Recommendation: {item['recommendation']}"
             ),
-            "metadata": {"source_type": "inventory", "product_id": _clean(item["product_id"]),
-                         "store_id": _clean(item["store_id"]), "category": _clean(item.get("category",""))}
+            "metadata": {
+                "source_type": "inventory",
+                "product_id": _clean(item["product_id"]),
+                "product_name": _clean(item["product_name"]),
+                "store_id": _clean(item["store_id"]),
+                "store_name": _clean(item["store_name"]),
+                "category": _clean(item.get("category", "")),
+                "health_status": status,
+                "current_stock": item["current_stock"],
+                "days_until_stockout": cov,
+                "urgency_rank": urgency_rank
+            }
         })
     # Product sales evidence (30d)
     for item in engine.get_product_sales_ranking(days=30, limit=100):
@@ -164,32 +193,86 @@ def load_index() -> Optional[Dict[str, Any]]:
     except Exception:
         return None
 
-def retrieve(engine, query: str, top_k: int = 5) -> Dict[str, Any]:
+def retrieve(engine, query: str, top_k: int = 5, store_id: Optional[str] = None) -> Dict[str, Any]:
     query = _clean(query)
     if not query:
         return {"query": query, "results": [], "error": "Query cannot be empty."}
     top_k = max(1, min(int(top_k), 10))
     index = load_index()
-    if index is None or len(index["documents"]) == 0:
-        build_index(engine)
+    if index is None or len(index.get("documents", [])) == 0 or "urgency_rank" not in index["documents"][0].get("metadata", {}):
+        build_index(engine, force=True)
         index = load_index()
     mode = index["mode"]
     if mode == "gemini":
         try:
             qv = _embed_gemini([query])[0]
         except Exception:
-            # If the stored Gemini index exists but the live embedding call fails,
-            # return a safe empty result rather than silently changing semantics.
-            return {"query": query, "results": [], "error": "Semantic retrieval is temporarily unavailable."}
+            qv = None
+            mode = "lexical_fallback"
     else:
+        qv = None
+
+    if mode != "gemini" or qv is None:
         vocab = index.get("vocabulary", {})
         qv = _lexical_vector(query, vocab)
+
     mat = index["embeddings"]
-    scores = mat @ qv
+    base_scores = mat @ qv
+    scores = np.copy(base_scores)
+
+    q_lower = query.lower()
+    is_reorder_query = any(w in q_lower for w in [
+        "reorder", "re-order", "replenish", "replenishment", "restock", "restocking",
+        "stockout", "stock out", "run out", "running out", "runs out", "ran out",
+        "out of stock", "low stock", "running low", "low on stock", "shortage", "shortages",
+        "urgent", "urgently", "uegently", "urgnt", "immediate attention", "what should i order"
+    ])
+    is_overstock_query = any(w in q_lower for w in ["overstock", "excess inventory", "too much stock"])
+    is_slow_moving_query = any(w in q_lower for w in ["slow moving", "slow-moving", "not selling"])
+
+    for i, doc in enumerate(index["documents"]):
+        meta = doc.get("metadata", {})
+        source_type = meta.get("source_type")
+
+        # Store filter matching
+        if store_id:
+            doc_store = meta.get("store_id")
+            if doc_store and doc_store != store_id:
+                scores[i] -= 10.0
+            elif doc_store == store_id:
+                scores[i] += 1.0
+
+        if is_reorder_query:
+            if source_type == "inventory":
+                status = meta.get("health_status")
+                cov = meta.get("days_until_stockout")
+                cov_val = cov if cov is not None else 0.0
+                if status == "OUT_OF_STOCK":
+                    scores[i] += 5.0
+                elif status == "IMMINENT_STOCKOUT_RISK":
+                    # Priority by shortest days until stockout
+                    scores[i] += 4.0 - min(cov_val * 0.2, 1.5)
+                elif status == "LOW_STOCK":
+                    scores[i] += 2.0
+                elif status == "OVERSTOCKED":
+                    scores[i] -= 2.0
+                elif status == "HEALTHY":
+                    scores[i] -= 3.0
+        elif is_overstock_query:
+            if source_type == "inventory":
+                if meta.get("health_status") == "OVERSTOCKED":
+                    scores[i] += 5.0
+                else:
+                    scores[i] -= 2.0
+        elif is_slow_moving_query:
+            if source_type == "inventory":
+                if "slow" in doc.get("text", "").lower() or meta.get("health_status") in ("OVERSTOCKED", "HEALTHY"):
+                    scores[i] += 3.0
+
     order = np.argsort(-scores)[:top_k]
     results = []
     for i in order:
-        if float(scores[i]) <= 0:
+        if float(scores[i]) <= -5.0 and len(results) >= top_k:
             continue
         doc = index["documents"][int(i)]
         results.append({"score": round(float(scores[i]), 4), "text": doc["text"],

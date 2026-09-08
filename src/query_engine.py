@@ -8,7 +8,13 @@ def understand_query(query: str) -> Dict[str, Optional[str]]:
         return {"intent": "empty", "product_id": None, "store_id": None}
     if any(w in q for w in ["profit", "profitable", "margin"]):
         intent = "profit_unavailable"
-    elif any(w in q for w in ["stockout", "stock out", "run out", "running out", "replenish"]):
+    elif any(w in q for w in [
+        "stockout", "stock out", "run out", "running out", "runs out", "ran out",
+        "replenish", "replenishment", "reorder", "re-order", "reordering",
+        "restock", "restocking", "out of stock", "low stock", "running low", "low on stock",
+        "order more", "shortage", "shortages",
+        "urgent", "urgently", "uegently", "urgnt", "immediate attention"
+    ]):
         intent = "stockout"
     elif any(w in q for w in ["overstock", "excess inventory", "too much stock"]):
         intent = "overstock"
@@ -18,7 +24,7 @@ def understand_query(query: str) -> Dict[str, Optional[str]]:
         intent = "sales_growth"
     elif any(w in q for w in ["drop", "decline", "decreased", "decrease", "falling"]):
         intent = "sales_decline"
-    elif any(w in q for w in ["store", "branch", "location"]) and any(w in q for w in ["best", "top", "perform"]):
+    elif any(w in q for w in ["store", "branch", "location"]) and any(w in q for w in ["best", "top", "perform", "highest", "sales", "revenue", "rank"]):
         intent = "store_performance"
     elif any(w in q for w in ["inventory", "stock", "attention", "risk"]):
         intent = "inventory"

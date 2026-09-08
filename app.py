@@ -132,8 +132,15 @@ class CopilotRequest(BaseModel):
 
 
 def _analytics_for_intent(intent: str, store_id: Optional[str], days: int) -> Dict[str, Any]:
-    if intent == "stockout":
-        return {"stockout_risks": engine.get_stockout_risks(store_id=store_id, max_days=7.0)}
+    if intent in ("stockout", "reorder"):
+        stockouts = engine.get_stockout_risks(store_id=store_id, max_days=7.0)
+        health = engine.get_inventory_health(store_id=store_id)
+        low_stock = [x for x in health if x["health_status"] == "LOW_STOCK"]
+        return {
+            "critical_stockouts": stockouts,
+            "low_stock_approaching_reorder": low_stock[:5],
+            "total_urgent_reorders_needed": len(stockouts)
+        }
     if intent == "overstock":
         return {"overstocked_items": engine.get_overstocked_items(store_id=store_id)}
     if intent == "slow_moving":
@@ -152,13 +159,14 @@ def _analytics_for_intent(intent: str, store_id: Optional[str], days: int) -> Di
 def _fallback_answer(intent: str, analytics: Dict[str, Any]) -> str:
     if intent == "profit_unavailable":
         return "I can't determine profit or profitability because the available RetailIQ dataset does not contain cost or profit data."
-    if intent == "stockout":
-        items = analytics.get("stockout_risks", [])
-        if not items: return "No stockout risks were identified within the configured 7-day threshold."
-        top = items[:3]
-        return "Stockout priorities: " + "; ".join(
-            f"{x['product_name']} at {x['store_name']} has {x['current_stock']} units and about {x['days_until_stockout']} days of coverage."
-            for x in top) + " Prioritize replenishment for the most urgent items."
+    if intent in ("stockout", "reorder"):
+        items = analytics.get("critical_stockouts", []) or analytics.get("stockout_risks", [])
+        if not items:
+            return "No critical stockout risks were identified within the configured threshold."
+        return "Critical reorder priorities: " + "; ".join(
+            f"{x['product_name']} at {x['store_name']} (Stock: {x['current_stock']} units, Coverage: {x['days_until_stockout']} days - {x['health_status'].replace('_', ' ')})"
+            for x in items[:4]
+        ) + ". Prioritize replenishment immediately."
     if intent == "overstock":
         items = analytics.get("overstocked_items", [])
         if not items: return "No overstocked inventory was identified."
@@ -202,8 +210,9 @@ def copilot(request: CopilotRequest):
     if parsed["intent"] == "empty":
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
 
-    analytics_payload = _analytics_for_intent(parsed["intent"], request.store_id or parsed["store_id"], request.days)
-    retrieval_payload = retrieve(engine, query, top_k=6)
+    active_store = request.store_id or parsed["store_id"]
+    analytics_payload = _analytics_for_intent(parsed["intent"], active_store, request.days)
+    retrieval_payload = retrieve(engine, query, top_k=6, store_id=active_store)
     evidence = compact_evidence(retrieval_payload.get("results", []))
 
     if parsed["intent"] == "profit_unavailable":
@@ -223,7 +232,9 @@ def copilot(request: CopilotRequest):
         "You are RetailIQ, a retail operations copilot. "
         "Answer only from the supplied deterministic analytics and retrieved evidence. "
         "Never invent or recalculate business numbers. If evidence is insufficient, say so. "
-        "Keep the answer concise and actionable. Separate findings from recommendations."
+        "Keep the answer concise and actionable. Separate findings from recommendations. "
+        "When deterministic evidence contains OUT OF STOCK or IMMINENT STOCKOUT RISK items, "
+        "always prioritize and report them as urgent reorders/replenishments."
     )
     result = gemini_client.generate(
         prompt=f"USER QUESTION:\n{query}\n\n{context}\n\n"
