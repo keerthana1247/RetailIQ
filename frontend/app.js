@@ -310,13 +310,14 @@ window.inspectProduct = inspectProduct;
 
 // 7. AI Copilot — grounded backend interaction
 function selectPrompt(promptText) {
+  const input = document.getElementById("copilot-input");
   const submit = document.getElementById("copilot-submit");
+
+  if (!input) return;
+
   if (submit && submit.disabled) return;
 
-  const input = document.getElementById("copilot-input");
-  if (input) {
-    input.value = promptText;
-  }
+  input.value = promptText;
   handleCopilotSubmit();
 }
 
